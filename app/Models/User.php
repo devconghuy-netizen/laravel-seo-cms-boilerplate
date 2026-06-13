@@ -75,7 +75,7 @@ class User extends Authenticatable
                 $role = Role::query()->whereName($role)->firstOrFail();
             }
 
-            $this->roles()->attach($role->id);
+            $this->roles()->syncWithoutDetaching([$role->id]);
         }
 
         return $this;
