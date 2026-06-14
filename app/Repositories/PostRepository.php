@@ -38,7 +38,26 @@ class PostRepository
     {
         return Post::published()
             ->where('slug', $slug)
-            ->with(['category', 'author', 'tags', 'seoMeta'])
+            ->with(['category', 'author', 'tags', 'seoMeta', 'affiliateLinks'])
             ->first();
+    }
+
+    public function getRelatedPublished(Post $post, int $limit = 3)
+    {
+        $tagIds = $post->tags->pluck('id');
+
+        return Post::published()
+            ->whereKeyNot($post->id)
+            ->where(function ($query) use ($post, $tagIds) {
+                $query->where('category_id', $post->category_id);
+
+                if ($tagIds->isNotEmpty()) {
+                    $query->orWhereHas('tags', fn ($query) => $query->whereIn('tags.id', $tagIds));
+                }
+            })
+            ->with(['category', 'author', 'tags'])
+            ->latest('published_at')
+            ->limit($limit)
+            ->get();
     }
 }

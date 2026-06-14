@@ -2,14 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Post;
 use App\Repositories\PostRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class PostService
 {
-    public function __construct(private PostRepository $repository)
-    {
-    }
+    public function __construct(private PostRepository $repository) {}
 
     public function listPublished(int $perPage = 10): LengthAwarePaginator
     {
@@ -24,5 +23,10 @@ class PostService
     public function findBySlug(string $slug)
     {
         return $this->repository->findBySlugWithRelations($slug);
+    }
+
+    public function relatedPublished(Post $post, int $limit = 3)
+    {
+        return $this->repository->getRelatedPublished($post, $limit);
     }
 }

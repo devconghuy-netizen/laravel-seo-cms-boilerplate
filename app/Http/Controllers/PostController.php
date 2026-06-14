@@ -7,9 +7,7 @@ use Illuminate\Http\Request;
 
 class PostController
 {
-    public function __construct(private PostService $service)
-    {
-    }
+    public function __construct(private PostService $service) {}
 
     public function index(Request $request)
     {
@@ -29,6 +27,9 @@ class PostController
             abort(404);
         }
 
-        return view('posts.show', compact('post'));
+        $post->incrementViews();
+        $relatedPosts = $this->service->relatedPublished($post);
+
+        return view('posts.show', compact('post', 'relatedPosts'));
     }
 }
