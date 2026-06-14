@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
+@section('title', 'Sản phẩm đề xuất | ' . ($siteSettings['site_name'] ?? 'AffiPress'))
+
 @section('content')
-    <h1 class="mb-4">San pham de xuat</h1>
+    <h1 class="mb-4">Sản phẩm đề xuất</h1>
 
     <div class="row g-3">
         @forelse($products as $product)
@@ -12,14 +14,15 @@
                         <h2 class="h5"><a href="{{ route('products.show', $product->slug) }}">{{ $product->title }}</a></h2>
                         <p class="text-muted">{{ $product->description }}</p>
                     </div>
-                    <div class="card-footer bg-white">
-                        <a class="btn btn-sm btn-outline-primary" href="{{ route('products.show', $product->slug) }}">Xem san pham</a>
+                    <div class="card-footer bg-white d-flex gap-2">
+                        <a class="btn btn-sm btn-outline-primary" href="{{ route('products.show', $product->slug) }}">Chi tiết</a>
+                        <a class="btn btn-sm btn-primary" href="{{ route('affiliate.redirect', $product->slug) }}" target="_blank" rel="nofollow sponsored noopener">Mở link</a>
                     </div>
                 </div>
             </div>
         @empty
             <div class="col-12">
-                <div class="alert alert-info">Chua co san pham nao.</div>
+                <div class="alert alert-info">Chưa có sản phẩm nào.</div>
             </div>
         @endforelse
     </div>

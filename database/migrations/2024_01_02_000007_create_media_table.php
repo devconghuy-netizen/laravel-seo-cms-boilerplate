@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -11,7 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('media', function (Blueprint $table) {
+        $urlExpression = DB::connection()->getDriverName() === 'sqlite'
+            ? "'/storage/' || path"
+            : "CONCAT('/storage/', path)";
+
+        Schema::create('media', function (Blueprint $table) use ($urlExpression) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('name');
@@ -20,7 +25,7 @@ return new class extends Migration
             $table->unsignedBigInteger('size')->comment('File size in bytes');
             $table->string('disk')->default('public');
             $table->string('path');
-            $table->string('url')->virtualAs("CONCAT('/storage/', path)");
+            $table->string('url')->virtualAs($urlExpression);
             $table->string('media_type')->comment('image, video, audio, document, archive');
             $table->unsignedInteger('width')->nullable();
             $table->unsignedInteger('height')->nullable();

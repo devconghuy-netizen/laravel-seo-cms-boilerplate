@@ -1,22 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="mb-4">Dang bai moi</h1>
+    <h1 class="mb-4">Đăng bài mới</h1>
 
-    <form method="POST" action="{{ route('creator.posts.store') }}" class="card card-body">
+    <form method="POST" action="{{ route('creator.posts.store') }}" class="card card-body" enctype="multipart/form-data">
         @csrf
 
         <div class="row g-3">
             <div class="col-md-8">
-                <label class="form-label" for="title">Tieu de</label>
+                <label class="form-label" for="title">Tiêu đề</label>
                 <input class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title') }}" required>
                 @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
             <div class="col-md-4">
-                <label class="form-label" for="category_id">Danh muc</label>
+                <label class="form-label" for="category_id">Danh mục</label>
                 <select class="form-select @error('category_id') is-invalid @enderror" id="category_id" name="category_id" required>
-                    <option value="">Chon danh muc</option>
+                    <option value="">Chọn danh mục</option>
                     @foreach($categories as $category)
                         <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>
                             {{ $category->getTranslation('name', app()->getLocale()) ?? $category->slug }}
@@ -27,35 +27,47 @@
             </div>
 
             <div class="col-12">
-                <label class="form-label" for="excerpt">Tom tat</label>
+                <label class="form-label" for="excerpt">Tóm tắt</label>
                 <textarea class="form-control @error('excerpt') is-invalid @enderror" id="excerpt" name="excerpt" rows="2">{{ old('excerpt') }}</textarea>
                 @error('excerpt')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
             <div class="col-12">
-                <label class="form-label" for="content">Noi dung bai viet</label>
+                <label class="form-label" for="content">Nội dung bài viết</label>
                 <textarea class="form-control @error('content') is-invalid @enderror" id="content" name="content" rows="10" required>{{ old('content') }}</textarea>
                 @error('content')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
-            <div class="col-md-8">
-                <label class="form-label" for="featured_image">Anh dai dien URL</label>
+            <div class="col-md-6">
+                <label class="form-label" for="featured_image">Ảnh đại diện URL</label>
                 <input class="form-control @error('featured_image') is-invalid @enderror" id="featured_image" name="featured_image" type="url" value="{{ old('featured_image') }}">
                 @error('featured_image')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
-            <div class="col-md-4">
-                <label class="form-label" for="status">Trang thai</label>
+            <div class="col-md-3">
+                <label class="form-label" for="featured_image_file">Upload ảnh đại diện</label>
+                <input class="form-control @error('featured_image_file') is-invalid @enderror" id="featured_image_file" name="featured_image_file" type="file" accept="image/*">
+                @error('featured_image_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label" for="status">Trạng thái</label>
                 <select class="form-select" id="status" name="status">
-                    <option value="draft" @selected(old('status') === 'draft')>Luu ban nhap</option>
-                    <option value="published" @selected(old('status') === 'published')>Xuat ban ngay</option>
+                    <option value="draft" @selected(old('status') === 'draft')>Lưu bản nháp</option>
+                    @can('publish', App\Models\Post::class)
+                        <option value="published" @selected(old('status') === 'published')>Xuất bản ngay</option>
+                    @endcan
                 </select>
             </div>
+
+            @include('posts.partials.tag-fields', ['post' => null])
         </div>
 
+        @include('posts.partials.seo-fields', ['post' => null])
+
         <div class="mt-4 d-flex gap-2">
-            <button class="btn btn-primary" type="submit">Luu bai viet</button>
-            <a class="btn btn-outline-secondary" href="{{ route('dashboard') }}">Huy</a>
+            <button class="btn btn-primary" type="submit">Lưu bài viết</button>
+            <a class="btn btn-outline-secondary" href="{{ route('dashboard') }}">Hủy</a>
         </div>
     </form>
 @endsection

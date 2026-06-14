@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AffiliateLink;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
@@ -19,8 +20,19 @@ class ProductController extends Controller
     {
         abort_unless($affiliateLink->is_active, 404);
 
-        $affiliateLink->recordClick();
-
         return view('products.show', ['product' => $affiliateLink]);
+    }
+
+    public function redirect(Request $request, AffiliateLink $affiliateLink)
+    {
+        abort_unless($affiliateLink->is_active, 404);
+
+        $affiliateLink->recordClick([
+            'ip_address' => $request->ip(),
+            'user_agent' => (string) $request->userAgent(),
+            'referrer' => $request->headers->get('referer'),
+        ]);
+
+        return redirect()->away($affiliateLink->url);
     }
 }

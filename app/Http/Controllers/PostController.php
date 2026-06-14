@@ -13,9 +13,10 @@ class PostController
 
     public function index(Request $request)
     {
-        $posts = $this->service->listPublished(10);
+        $search = trim((string) $request->query('q', ''));
+        $posts = $this->service->searchPublished($search, 10);
 
-        return view('posts.index', compact('posts'));
+        return view('posts.index', compact('posts', 'search'));
     }
 
     public function show(Request $request, $post)

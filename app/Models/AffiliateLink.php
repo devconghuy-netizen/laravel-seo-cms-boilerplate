@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AffiliateLink extends Model
@@ -22,11 +23,17 @@ class AffiliateLink extends Model
         'product_id',
         'commission_rate',
         'type',
+        'clicks',
+        'conversions',
+        'earnings',
         'is_active',
     ];
 
     protected $casts = [
+        'clicks' => 'integer',
+        'conversions' => 'integer',
         'commission_rate' => 'float',
+        'earnings' => 'float',
         'is_active' => 'boolean',
     ];
 
@@ -36,6 +43,22 @@ class AffiliateLink extends Model
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);
+    }
+
+    /**
+     * Get click events for this affiliate link.
+     */
+    public function clickEvents(): HasMany
+    {
+        return $this->hasMany(AffiliateClick::class);
+    }
+
+    /**
+     * Get conversion events for this affiliate link.
+     */
+    public function conversionEvents(): HasMany
+    {
+        return $this->hasMany(AffiliateConversion::class);
     }
 
     /**
@@ -65,9 +88,15 @@ class AffiliateLink extends Model
     /**
      * Record a click on this affiliate link.
      */
-    public function recordClick(): self
+    public function recordClick(array $metadata = []): self
     {
         $this->increment('clicks');
+        $this->clickEvents()->create([
+            'ip_address' => $metadata['ip_address'] ?? null,
+            'user_agent' => $metadata['user_agent'] ?? null,
+            'referrer' => $metadata['referrer'] ?? null,
+            'clicked_at' => $metadata['clicked_at'] ?? now(),
+        ]);
 
         return $this;
     }
@@ -75,9 +104,17 @@ class AffiliateLink extends Model
     /**
      * Record a conversion.
      */
-    public function recordConversion(): self
+    public function recordConversion(array $metadata = []): self
     {
         $this->increment('conversions');
+        $this->earnings = $this->calculateEarnings();
+        $this->conversionEvents()->create([
+            'amount' => $metadata['amount'] ?? ($this->commission_rate ? $this->commission_rate / 100 : 0),
+            'ip_address' => $metadata['ip_address'] ?? null,
+            'user_agent' => $metadata['user_agent'] ?? null,
+            'referrer' => $metadata['referrer'] ?? null,
+            'converted_at' => $metadata['converted_at'] ?? now(),
+        ]);
         $this->save();
 
         return $this;

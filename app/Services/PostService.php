@@ -16,6 +16,11 @@ class PostService
         return $this->repository->getPublishedPaginated($perPage);
     }
 
+    public function searchPublished(?string $term, int $perPage = 10): LengthAwarePaginator
+    {
+        return $this->repository->searchPublishedPaginated($term, $perPage);
+    }
+
     public function findBySlug(string $slug)
     {
         return $this->repository->findBySlugWithRelations($slug);
