@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Mail\Transport\BrevoApiTransport;
 use App\Models\Category;
 use App\Models\AffiliateConversion;
 use App\Models\AuditLog;
@@ -13,6 +14,7 @@ use App\Policies\CategoryPolicy;
 use App\Policies\PostPolicy;
 use App\Policies\TagPolicy;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
@@ -34,6 +36,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Mail::extend('brevo-api', fn (array $config) => new BrevoApiTransport($config['key'] ?? null));
+
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }

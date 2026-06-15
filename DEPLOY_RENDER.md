@@ -45,3 +45,14 @@ php artisan schedule:run
 Render free web services can sleep when inactive. For public users, upgrade the web service plan when you need faster wake-up and more stable traffic.
 
 Uploaded files should not stay on the Render local filesystem for production. Use S3-compatible storage, Supabase Storage, or another persistent file service before real users upload media.
+
+## Brevo Email
+
+For production email verification, use Brevo API instead of SMTP on Render free instances:
+
+- `MAIL_MAILER=brevo-api`
+- `BREVO_API_KEY`: create this in Brevo under SMTP & API > API Keys
+- `MAIL_FROM_ADDRESS`: a sender address verified in Brevo
+- `MAIL_FROM_NAME=AffiPress`
+
+After changing mail environment variables in Render, save changes and deploy the latest commit.

@@ -42,6 +42,8 @@ services:
       - key: QUEUE_CONNECTION
         value: database
       - key: MAIL_MAILER
-        value: log
+        value: brevo-api
+      - key: BREVO_API_KEY
+        sync: false
       - key: FILESYSTEM_DISK
         value: local
