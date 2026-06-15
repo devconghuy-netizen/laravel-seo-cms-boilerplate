@@ -12,11 +12,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $urlExpression = DB::connection()->getDriverName() === 'sqlite'
+        $driver = DB::connection()->getDriverName();
+        $urlExpression = in_array($driver, ['pgsql', 'sqlite'], true)
             ? "'/storage/' || path"
             : "CONCAT('/storage/', path)";
 
-        Schema::create('media', function (Blueprint $table) use ($urlExpression) {
+        Schema::create('media', function (Blueprint $table) use ($driver, $urlExpression) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('name');
@@ -25,7 +26,9 @@ return new class extends Migration
             $table->unsignedBigInteger('size')->comment('File size in bytes');
             $table->string('disk')->default('public');
             $table->string('path');
-            $table->string('url')->virtualAs($urlExpression);
+            $driver === 'pgsql'
+                ? $table->string('url')->storedAs($urlExpression)
+                : $table->string('url')->virtualAs($urlExpression);
             $table->string('media_type')->comment('image, video, audio, document, archive');
             $table->unsignedInteger('width')->nullable();
             $table->unsignedInteger('height')->nullable();
