@@ -54,6 +54,10 @@
         @apply block rounded-md px-3 py-2 text-sm font-medium text-slate-600 no-underline hover:bg-slate-100 hover:text-slate-950;
     }
 
+    .nav-link.active {
+        @apply bg-blue-50 text-blue-700 ring-1 ring-blue-100;
+    }
+
     .btn {
         @apply inline-flex items-center justify-center gap-2 rounded-md border border-transparent px-4 py-2 text-sm font-medium no-underline shadow-sm transition hover:no-underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-60;
     }
@@ -214,7 +218,7 @@
     }
 
     .table {
-        @apply min-w-full divide-y divide-slate-200;
+        @apply min-w-full table-auto divide-y divide-slate-200;
     }
 
     .pagination {
@@ -249,6 +253,10 @@
         @apply px-2;
     }
 
+    .row.g-2 {
+        @apply gap-y-3;
+    }
+
     .g-3,
     .g-4 {
         @apply gap-y-4;
@@ -268,6 +276,7 @@
     .col-md-5,
     .col-md-6,
     .col-md-8,
+    .col-md-10,
     .col-lg-2,
     .col-lg-4,
     .col-lg-5,
@@ -302,6 +311,10 @@
 
         .col-md-8 {
             @apply w-2/3;
+        }
+
+        .col-md-10 {
+            @apply w-5/6;
         }
     }
 
@@ -347,6 +360,10 @@
 
     .d-inline {
         @apply inline;
+    }
+
+    .d-grid {
+        @apply grid;
     }
 
     .justify-content-between {
@@ -543,5 +560,36 @@
 
     .text-decoration-none {
         @apply no-underline;
+    }
+
+    .card.card-body {
+        @apply flex flex-col justify-center gap-1;
+    }
+
+    a.card {
+        @apply text-slate-900 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md;
+    }
+
+    a.card strong {
+        @apply text-blue-700;
+    }
+
+    .table th,
+    .table td {
+        @apply whitespace-nowrap;
+    }
+
+    .table th:nth-child(2),
+    .table td:nth-child(2) {
+        @apply min-w-72 whitespace-normal;
+    }
+
+    .table th:last-child,
+    .table td:last-child {
+        @apply min-w-72;
+    }
+
+    .table td:last-child {
+        @apply space-x-1;
     }
 }

@@ -22,6 +22,28 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
+@php
+    $navItems = [
+        ['label' => 'Bài viết', 'route' => 'home', 'active' => request()->routeIs('home', 'posts.*', 'categories.show', 'tags.show')],
+        ['label' => 'Sản phẩm', 'route' => 'products.index', 'active' => request()->routeIs('products.*')],
+    ];
+
+    if (auth()->check()) {
+        $navItems[] = ['label' => 'Dashboard', 'route' => 'dashboard', 'active' => request()->routeIs('dashboard')];
+        $navItems[] = ['label' => 'Đăng bài', 'route' => 'creator.posts.create', 'active' => request()->routeIs('creator.posts.create')];
+
+        if (auth()->user()->can('manageAll', App\Models\Post::class)) {
+            $navItems[] = ['label' => 'Quản trị', 'route' => 'admin.posts.index', 'active' => request()->routeIs('admin.posts.*')];
+        }
+
+        if (auth()->user()->hasPermission('manage-users')) {
+            $navItems[] = ['label' => 'Users', 'route' => 'admin.users.index', 'active' => request()->routeIs('admin.users.*')];
+            $navItems[] = ['label' => 'Audit', 'route' => 'admin.audit-logs.index', 'active' => request()->routeIs('admin.audit-logs.*')];
+            $navItems[] = ['label' => 'Health', 'route' => 'admin.health.index', 'active' => request()->routeIs('admin.health.*')];
+            $navItems[] = ['label' => 'Settings', 'route' => 'admin.settings.edit', 'active' => request()->routeIs('admin.settings.*')];
+        }
+    }
+@endphp
 <nav class="border-b border-slate-200 bg-white">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex min-h-16 flex-wrap items-center justify-between gap-3 py-3">
@@ -31,21 +53,13 @@
             </button>
             <div class="hidden w-full items-center justify-between gap-4 lg:flex lg:w-auto lg:flex-1" id="mainNav" data-nav-menu>
                 <ul class="flex flex-col gap-1 lg:ml-6 lg:flex-row lg:items-center lg:gap-2">
-                    <li><a class="nav-link" href="{{ route('home') }}">Bài viết</a></li>
-                    <li><a class="nav-link" href="{{ route('products.index') }}">Sản phẩm</a></li>
-                    @auth
-                        <li><a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li><a class="nav-link" href="{{ route('creator.posts.create') }}">Đăng bài</a></li>
-                        @can('manageAll', App\Models\Post::class)
-                            <li><a class="nav-link" href="{{ route('admin.posts.index') }}">Quản trị</a></li>
-                        @endcan
-                        @if(auth()->user()->hasPermission('manage-users'))
-                            <li><a class="nav-link" href="{{ route('admin.users.index') }}">Users</a></li>
-                            <li><a class="nav-link" href="{{ route('admin.audit-logs.index') }}">Audit</a></li>
-                            <li><a class="nav-link" href="{{ route('admin.health.index') }}">Health</a></li>
-                            <li><a class="nav-link" href="{{ route('admin.settings.edit') }}">Settings</a></li>
-                        @endif
-                    @endauth
+                    @foreach($navItems as $item)
+                        <li>
+                            <a class="nav-link {{ $item['active'] ? 'active' : '' }}" href="{{ route($item['route']) }}" @if($item['active']) aria-current="page" @endif>
+                                {{ $item['label'] }}
+                            </a>
+                        </li>
+                    @endforeach
                 </ul>
                 <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
                     @guest
